@@ -1,0 +1,19 @@
+{
+  "persons": [
+    {
+      "name": "Mikko Mallikas",
+      "number": "050-4444444",
+      "id": 1
+    },
+    {
+      "name": "Matti Esko",
+      "number": "040-43242123",
+      "id": 2
+    },
+    {
+      "name": "Simo Häyhä",
+      "number": "543636",
+      "id": 3
+    }
+  ]
+}
