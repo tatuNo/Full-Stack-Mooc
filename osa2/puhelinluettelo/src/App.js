@@ -1,81 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import personService from './services/persons'
-
-const Notification = ({message}) => {
-  if(message === null) {
-    return null
-  }
-
-  const notificationStyle = {
-    color: `${message.color}`,
-    background: 'lightgrey',
-    fontSize: 20,
-    borderStyle: 'solid',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10
-  }
-
-  return (
-    <div style={notificationStyle}>
-      {message.text}
-    </div>
-  )
-}
-
-const Persons = ({persons,filter, handleDelete}) => {
-  const filteredPersons = persons.filter(person =>
-  person.name.toLocaleLowerCase().includes(filter.toLocaleLowerCase()))  
-  const personsToDisplay = filter ? filteredPersons : persons
-
-  return(
-    <div>
-    {personsToDisplay.map(person =>
-      <Person key={person.name} name={person.name} number={person.number} handleDelete={handleDelete} /> 
-      )}
-    </div>
-  )
-}
-
-const Person = ({name, number,handleDelete}) => {
-  return(
-    <p>{name} {number}<button onClick={(e) => handleDelete(e,name)}>delete</button></p>
-  )
-}
-
-const Filter = (props) => {
-  return(
-    <div>
-    search <input
-      value={props.filter}
-      onChange={props.onChange} />
-      </div>
-  )
-}
-
-const PersonForm = (props) => {
-  return(
-    <form onSubmit={props.addPerson}>
-        <div>
-          <div>
-          name: <input
-          value={props.newName}
-          onChange={props.handleNameChange} />
-          </div>
-          <div>
-          number: <input
-          value={props.newNumber}
-          onChange={props.handleNumberChange} />
-          </div>
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
-      
-  )
-}
-
+import Notification from './components/Notification'
+import Filter from './components/Filter'
+import PersonForm from './components/PersonForm'
+import Persons from './components/Persons'
+ 
 const App = () => {
   const [ persons, setPersons] = useState([]) 
   const [ newName, setNewName ] = useState('')
@@ -113,18 +42,26 @@ const App = () => {
           )
           setTimeout(() => {
             setNotification(null)
-          }, 3000)
+          }, 5000)
       })
       .catch(error => {
+        if(error.message === 'Request failed with status code 404') {
         setNotification (
           {
             text: `Information of ${obj.name} has already been removed from server`,
             color: 'red'
           }
-        )
+        )} else {
+          setNotification (
+            {
+              text: `${error.response.data.error}`,
+              color: 'red'
+            }
+          )
+        }
         setTimeout(() => {
           setNotification(null)
-        },3000)
+        },5000)
       })
     }
     }
@@ -143,11 +80,20 @@ const App = () => {
     {
     text: `Added ${returnedPerson.name}`,
     color: 'green'
-    }
-    )
+    })
     setTimeout(() => {
       setNotification(null)
-    }, 3000)
+    }, 5000)
+    })
+    .catch(error => {
+      setNotification(
+        {
+          text: `${error.response.data.error}`,
+          color: 'red'
+        })
+      setTimeout(()=> {
+        setNotification(null)
+      }, 5000)  
     })
   }
   }
@@ -184,7 +130,7 @@ const App = () => {
       )
       setTimeout(() => {
         setNotification(null)
-      }, 3000)
+      }, 5000)
   }
   }
 
@@ -200,7 +146,6 @@ const App = () => {
       <Persons persons={persons} filter={filter} handleDelete={handleDelete}/>
     </div>
   )
-
 }
 
 export default App;
