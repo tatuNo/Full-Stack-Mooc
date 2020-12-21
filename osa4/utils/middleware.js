@@ -9,6 +9,14 @@ const requestLogger = (request, response, next) => {
     next()
 }
 
+const tokenExtractor = (request, response, next) => {
+  const authorization = request.get('authorization')
+  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+    request.token = authorization.substring(7)
+  }
+  next()
+}
+
 const unknownEndpoint = (request, response) => {
     response.status(404).send({ error: 'unknown endpoint' })
 }
@@ -28,18 +36,6 @@ const errorHandler = (error, request, response, next) => {
   next(error)
 }
 
-const tokenExtractor = (request, response, next) => {
-
-  if(request.method != 'GET'  && request.path.startsWith('/api/blogs')) {
-    const authorization = request.get('authorization')
-    if(authorization && authorization.toLowerCase().startsWith('bearer ')) {
-    request.token = authorization.substring(7)
-  } else {
-    return response.status(401).json({ error: 'token missing' })
-  }
-}
-  next()
-}
 module.exports = {
 errorHandler,
 requestLogger,
