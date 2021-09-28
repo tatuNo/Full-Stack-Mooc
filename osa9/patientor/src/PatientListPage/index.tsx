@@ -8,9 +8,12 @@ import { Patient } from "../types";
 import { apiBaseUrl } from "../constants";
 import HealthRatingBar from "../components/HealthRatingBar";
 import { useStateValue } from "../state";
+import { useHistory } from "react-router-dom";
+import { addPatient } from "../state";
 
 const PatientListPage = () => {
   const [{ patients }, dispatch] = useStateValue();
+  const history = useHistory();
 
   const [modalOpen, setModalOpen] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | undefined>();
@@ -28,12 +31,16 @@ const PatientListPage = () => {
         `${apiBaseUrl}/patients`,
         values
       );
-      dispatch({ type: "ADD_PATIENT", payload: newPatient });
+      dispatch(addPatient(newPatient));
       closeModal();
     } catch (e) {
       console.error(e.response?.data || 'Unknown Error');
-      setError(e.response?.data?.error || 'Unknown error');
+      setError(e.response?.data || 'Unknown error');
     }
+  };
+
+  const redirectToPatientPage = (patient: string): void => {
+    history.push(`/patients/${patient}`);
   };
 
   return (
@@ -53,7 +60,7 @@ const PatientListPage = () => {
         <Table.Body>
           {Object.values(patients).map((patient: Patient) => (
             <Table.Row key={patient.id}>
-              <Table.Cell>{patient.name}</Table.Cell>
+              <Table.Cell onClick={() => redirectToPatientPage(patient.id)}>{patient.name}</Table.Cell>
               <Table.Cell>{patient.gender}</Table.Cell>
               <Table.Cell>{patient.occupation}</Table.Cell>
               <Table.Cell>
